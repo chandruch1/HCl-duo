@@ -29,6 +29,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+//Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // Seed Admin
 using (var scope = app.Services.CreateScope())
 {
@@ -49,6 +60,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Angular");
 
 app.UseAuthorization();
 
