@@ -10,7 +10,7 @@ public class Student
     public int Id { get; set; }
 
     [Required]
-    public string UserId { get; set; } = string.Empty;
+    public int UserId { get; set; } 
 
     [Required]
     [Phone]
