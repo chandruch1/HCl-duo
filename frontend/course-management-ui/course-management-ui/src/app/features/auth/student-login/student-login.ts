@@ -23,6 +23,7 @@ export class StudentLogin {
 
   errorMessage = '';
   isSubmitting = false;
+  showPassword=false;
 
   // FormGroup
   loginForm = new FormGroup({
@@ -39,6 +40,10 @@ export class StudentLogin {
 
   });
 
+  togglePasswordVisibility(): void{
+      this.showPassword=!this.showPassword
+    }
+
   onLogin(): void {
 
     if (this.loginForm.invalid) {
@@ -53,6 +58,7 @@ export class StudentLogin {
       email: this.loginForm.value.email!,
       password: this.loginForm.value.password!
     };
+
 
     this.authService.loginStudent(loginData).subscribe({
 

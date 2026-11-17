@@ -49,6 +49,8 @@ export class StudentRegister {
   errorMessage = '';
   successMessage = '';
   isSubmitting = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
   // Registration Form
   registerForm = new FormGroup({
@@ -88,13 +90,25 @@ export class StudentRegister {
   validators: passwordMatchValidator
 });
 
+//eye icon
+  togglePasswordVisibility(): void {
+  this.showPassword = !this.showPassword;
+}
+
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   // Student Registration
   onRegister(): void {
-
+    console.log(`register is clicked`)
+    console.log(`Register is valid:${this.registerForm.valid}`);
+    console.log(this.registerForm.getRawValue())
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
+    
 
     this.isSubmitting = true;
     this.errorMessage = '';
