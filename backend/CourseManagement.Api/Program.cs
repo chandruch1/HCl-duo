@@ -1,6 +1,10 @@
 using CourseManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using CourseManagement.Api.Repositories.Interfaces;
+using CourseManagement.Api.Repositories.Implementations;
+using CourseManagement.Api.Interfaces.Services;
+using CourseManagement.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+//Dependency Injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Database connection
 builder.Services.AddDbContext<AppDbContext>(options =>
