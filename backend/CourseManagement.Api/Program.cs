@@ -1,4 +1,3 @@
-
 using CourseManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -19,6 +18,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 var app = builder.Build();
+
+// Seed Admin
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+
+    var configuration = scope.ServiceProvider
+        .GetRequiredService<IConfiguration>();
+
+    await AdminSeeder.SeedAdminAsync(context, configuration);
+}
 
 // HTTP pipeline
 if (app.Environment.IsDevelopment())
