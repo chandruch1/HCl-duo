@@ -7,13 +7,15 @@ import {
 } from '@angular/forms';
 
 import { AuthService, LoginDto } from '../../../core/services/auth';
+import { RouterLink } from '@angular/router';
+
 
 @Component({
   selector: 'app-student-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './student-login.html',
-  styleUrl: './student-login.scss'
+  styleUrl: './student-login.css'
 })
 export class StudentLogin {
 
