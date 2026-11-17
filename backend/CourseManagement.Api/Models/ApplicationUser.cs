@@ -1,7 +1,7 @@
 
 namespace CourseManagement.Api.Models;
 
-public class User
+public class ApplicationUser
 {
     public int Id { get; set; }
 
