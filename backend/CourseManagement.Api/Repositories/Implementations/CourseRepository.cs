@@ -8,9 +8,9 @@ namespace CourseManagement.Api.Repositories.Implementations;
 
 public class CourseRepository : ICourseRepository
 {
-    private readonly ApplicationDbContext _context;
+    private readonly AppDbContext _context;
 
-    public CourseRepository(ApplicationDbContext context)
+    public CourseRepository(AppDbContext context)
     {
         _context = context;
     }
@@ -29,7 +29,6 @@ public class CourseRepository : ICourseRepository
     {
         await _context.Courses.AddAsync(course);
         await _context.SaveChangesAsync();
-
         return course;
     }
 
@@ -37,7 +36,6 @@ public class CourseRepository : ICourseRepository
     {
         _context.Courses.Update(course);
         await _context.SaveChangesAsync();
-
         return course;
     }
 
@@ -46,15 +44,11 @@ public class CourseRepository : ICourseRepository
         var course = await _context.Courses.FindAsync(id);
 
         if (course == null)
-        {
             return false;
-        }
 
-        // Soft delete: preserve enrollment history
         course.IsActive = false;
 
         await _context.SaveChangesAsync();
-
         return true;
     }
 }
