@@ -5,6 +5,7 @@ using CourseManagement.Api.Repositories.Interfaces;
 using CourseManagement.Api.Repositories.Implementations;
 using CourseManagement.Api.Interfaces.Services;
 using CourseManagement.Api.Services;
+using CourseManagement.Api.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddOpenApi();
 
 //Dependency Injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Database connection
