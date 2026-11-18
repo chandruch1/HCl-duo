@@ -49,5 +49,9 @@ export class StudentService {
   updateMyProfile(dto: UpdateStudentDto): Observable<Student> {
     return this.http.put<Student>(`${this.apiUrl}/me`, dto);
   }
+  //
+  updateStudent(id: number,dto: UpdateStudentDto): Observable<{ message: string; data: Student }> {
+  return this.http.put<{ message: string; data: Student }>( `${this.apiUrl}/${id}`,dto);
+}
 
 }

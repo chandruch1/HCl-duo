@@ -2,11 +2,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-import {
-  StudentService,
-  Student
-} from '../../../../core/services/student';
+import { StudentService, Student } from '../../../../core/services/student';
 
 @Component({
   selector: 'app-student-list',
@@ -32,32 +28,33 @@ export class StudentList implements OnInit {
 
   // Load all students
   loadStudents(): void {
+  this.isLoading = true;
+  this.errorMessage = '';
 
-    this.isLoading = true;
-    this.errorMessage = '';
+  this.studentService.getAllStudents().subscribe({
+    next: (response) => {
+      console.log('API Response:', response);
+      console.log('Is Array:', Array.isArray(response));
 
-    this.studentService.getAllStudents().subscribe({
+      this.students = response;
 
-      next: (response) => {
+      console.log('Students:', this.students);
+      console.log('Student Count:', this.students.length);
 
-        this.students = response;
-        this.isLoading = false;
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error loading students:', error);
 
-      },
+      this.errorMessage =
+        error.error?.message || 'Unable to load students.';
 
-      error: (error) => {
+      this.isLoading = false;
+    }
+  });
+}
 
-        console.error('Error loading students:', error);
-
-        this.errorMessage =
-          error.error?.message || 'Unable to load students.';
-
-        this.isLoading = false;
-
-      }
-
-    });
-  }
+  
 
   // Filter students by name, email or phone
   get filteredStudents(): Student[] {

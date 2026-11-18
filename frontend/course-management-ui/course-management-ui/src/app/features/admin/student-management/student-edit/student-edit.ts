@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { StudentService, Student } from '../../../../core/services/student';
+import { StudentService, Student, UpdateStudentDto } from '../../../../core/services/student';
 
 @Component({
   selector: 'app-student-edit',
@@ -50,6 +50,35 @@ export class StudentEdit implements OnInit {
     })
 
   });
+
+  onSubmit(): void {
+  if (this.editForm.invalid || !this.student) {
+    this.editForm.markAllAsTouched();
+    return;
+  }
+
+  this.isSubmitting = true;
+  this.errorMessage = '';
+  this.successMessage = '';
+
+  const dto: UpdateStudentDto = {
+    phone: this.editForm.controls.phone.value,
+    address: this.editForm.controls.address.value || null,
+    dateOfBirth: this.editForm.controls.dateOfBirth.value || null
+  };
+
+  this.studentService.updateStudent(this.student.id, dto).subscribe({
+    next: response => {
+      this.student = response.data;
+      this.successMessage = response.message;
+      this.isSubmitting = false;
+    },
+    error: error => {
+      this.errorMessage = error.error?.message || 'Unable to update student.';
+      this.isSubmitting = false;
+    }
+  });
+}
 
   ngOnInit(): void {
 
