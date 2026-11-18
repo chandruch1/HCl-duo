@@ -11,12 +11,14 @@ import {
   ValidatorFn
 } from '@angular/forms';
 
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import {
   AuthService,
   RegisterDto
 } from '../../../core/services/auth';
+
+import { Token } from '../../../core/services/token';
 
 // Custom password matching validator
 const passwordMatchValidator: ValidatorFn = (
@@ -45,6 +47,8 @@ const passwordMatchValidator: ValidatorFn = (
 export class StudentRegister {
 
   private authService = inject(AuthService);
+  private tokenService = inject(Token);
+  private router = inject(Router);
 
   errorMessage = '';
   successMessage = '';
@@ -55,45 +59,45 @@ export class StudentRegister {
   // Registration Form
   registerForm = new FormGroup({
 
-  fullName: new FormControl('', {
-    nonNullable: true,
-    validators: [
-      Validators.required,
-      Validators.minLength(2)
-    ]
-  }),
+    fullName: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(2)
+      ]
+    }),
 
-  email: new FormControl('', {
-    nonNullable: true,
-    validators: [
-      Validators.required,
-      Validators.email
-    ]
-  }),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.email
+      ]
+    }),
 
-  password: new FormControl('', {
-    nonNullable: true,
-    validators: [
-      Validators.required,
-      Validators.minLength(8)
-    ]
-  }),
+    password: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(8)
+      ]
+    }),
 
-  confirmPassword: new FormControl('', {
-    nonNullable: true,
-    validators: [
-      Validators.required
-    ]
-  })
+    confirmPassword: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required
+      ]
+    })
 
-}, {
-  validators: passwordMatchValidator
-});
+  }, {
+    validators: passwordMatchValidator
+  });
 
-//eye icon
+  // Password visibility
   togglePasswordVisibility(): void {
-  this.showPassword = !this.showPassword;
-}
+    this.showPassword = !this.showPassword;
+  }
 
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
@@ -101,14 +105,11 @@ export class StudentRegister {
 
   // Student Registration
   onRegister(): void {
-    console.log(`register is clicked`)
-    console.log(`Register is valid:${this.registerForm.valid}`);
-    console.log(this.registerForm.getRawValue())
+
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
-    
 
     this.isSubmitting = true;
     this.errorMessage = '';
@@ -126,18 +127,17 @@ export class StudentRegister {
 
       next: (response) => {
 
-        // Store JWT token
-        sessionStorage.setItem('token', response.token);
-
-        sessionStorage.setItem('userId', response.userId.toString());
-        sessionStorage.setItem('role', response.role);
-        sessionStorage.setItem('fullName', response.fullName);
+        // Save session using Token Service
+        this.tokenService.saveSession(response);
 
         this.successMessage = 'Registration successful!';
 
+        this.isSubmitting = false;
+
         this.registerForm.reset();
 
-        this.isSubmitting = false;
+        // Navigate to Student Dashboard
+        this.router.navigate(['/student/dashboard']);
       },
 
       error: (error) => {

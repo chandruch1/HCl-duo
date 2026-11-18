@@ -6,6 +6,10 @@ using CourseManagement.Api.Repositories.Implementations;
 using CourseManagement.Api.Interfaces.Services;
 using CourseManagement.Api.Services;
 using CourseManagement.Api.Services.Implementations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,15 +23,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-// Database connection
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
-
-var app = builder.Build();
+builder.Services.AddScoped<IStudentRepository,StudentRepository>();
 
 //Cors
 builder.Services.AddCors(options =>
@@ -39,6 +35,15 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+// Database connection
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
+
+var app = builder.Build();
 
 // Seed Admin
 using (var scope = app.Services.CreateScope())

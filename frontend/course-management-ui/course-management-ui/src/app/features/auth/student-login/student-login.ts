@@ -1,3 +1,4 @@
+
 import { Component, inject } from '@angular/core';
 import {
   FormGroup,
@@ -7,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import { AuthService, LoginDto } from '../../../core/services/auth';
-import { RouterLink } from '@angular/router';
-
+import { Router, RouterLink } from '@angular/router';
+import { Token } from '../../../core/services/token';
 
 @Component({
   selector: 'app-student-login',
@@ -20,29 +21,30 @@ import { RouterLink } from '@angular/router';
 export class StudentLogin {
 
   private authService = inject(AuthService);
+  private tokenService = inject(Token);
+  private router = inject(Router);
 
   errorMessage = '';
   isSubmitting = false;
-  showPassword=false;
+  showPassword = false;
 
-  // FormGroup
   loginForm = new FormGroup({
 
-    // FormControls
-    email: new FormControl('', [
-      Validators.required,
-      Validators.email
-    ]),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.email]
+    }),
 
-    password: new FormControl('', [
-      Validators.required
-    ])
+    password: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required]
+    })
 
   });
 
-  togglePasswordVisibility(): void{
-      this.showPassword=!this.showPassword
-    }
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   onLogin(): void {
 
@@ -54,22 +56,17 @@ export class StudentLogin {
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    const loginData: LoginDto = {
-      email: this.loginForm.value.email!,
-      password: this.loginForm.value.password!
-    };
-
+    const loginData: LoginDto = this.loginForm.getRawValue();
 
     this.authService.loginStudent(loginData).subscribe({
 
       next: (response) => {
 
-        sessionStorage.setItem('token', response.token);
-        sessionStorage.setItem('userId', response.userId.toString());
-        sessionStorage.setItem('role', response.role);
-        sessionStorage.setItem('fullName', response.fullName);
+        this.tokenService.saveSession(response);
 
         this.isSubmitting = false;
+
+        this.router.navigate(['/student/dashboard']);
       },
 
       error: (error) => {

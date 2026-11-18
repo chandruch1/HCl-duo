@@ -3,6 +3,7 @@ using CourseManagement.Api.DTOs.Auth;
 using CourseManagement.Api.Interfaces.Services;
 using CourseManagement.Api.Models;
 using CourseManagement.Api.Repositories.Interfaces;
+using CourseManagement.Api.Enums;
 
 namespace CourseManagement.Api.Services;
 
@@ -24,23 +25,26 @@ public class AuthService : IAuthService
     {
         string email = dto.Email.Trim().ToLowerInvariant();
 
-        // Check whether email already exists
         bool emailExists = await _userRepository.EmailExistsAsync(email);
 
         if (emailExists)
             throw new InvalidOperationException("Email already registered.");
 
-        // Create student user
         var user = new ApplicationUser
         {
             FullName = dto.FullName.Trim(),
             Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            Role = "Student",
-            CreatedAt = DateTime.UtcNow
+            Role = UserRole.Student,
+            CreatedAt = DateTime.UtcNow,
+
+            // Create Student profile along with User
+            Student = new Student
+            {
+                Phone = dto.Phone.Trim()
+            }
         };
 
-        // Save user through repository
         await _userRepository.CreateAsync(user);
 
         return GenerateAuthResponse(user);
@@ -54,10 +58,11 @@ public class AuthService : IAuthService
         var user = await _userRepository.GetByEmailAsync(email);
 
         if (user == null ||
-            user.Role != "Student" ||
+            user.Role != UserRole.Student ||
             !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {
-            throw new UnauthorizedAccessException("Invalid email or password.");
+            throw new UnauthorizedAccessException(
+                "Invalid email or password.");
         }
 
         return GenerateAuthResponse(user);
@@ -71,10 +76,11 @@ public class AuthService : IAuthService
         var user = await _userRepository.GetByEmailAsync(email);
 
         if (user == null ||
-            user.Role != "Admin" ||
+            user.Role != UserRole.Admin ||
             !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {
-            throw new UnauthorizedAccessException("Invalid email or password.");
+            throw new UnauthorizedAccessException(
+                "Invalid email or password.");
         }
 
         return GenerateAuthResponse(user);
@@ -88,7 +94,7 @@ public class AuthService : IAuthService
             UserId = user.Id,
             FullName = user.FullName,
             Email = user.Email,
-            Role = user.Role,
+            Role = user.Role.ToString(),
             Token = _jwtService.GenerateToken(user)
         };
     }

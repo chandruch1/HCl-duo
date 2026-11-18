@@ -1,3 +1,4 @@
+
 import { Component, inject } from '@angular/core';
 import {
   FormGroup,
@@ -5,8 +6,10 @@ import {
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { AuthService, LoginDto } from '../../../core/services/auth';
+import { Token } from '../../../core/services/token';
 
 @Component({
   selector: 'app-admin-login',
@@ -18,6 +21,8 @@ import { AuthService, LoginDto } from '../../../core/services/auth';
 export class AdminLogin {
 
   private authService = inject(AuthService);
+  private tokenService = inject(Token);
+  private router = inject(Router);
 
   errorMessage = '';
   isSubmitting = false;
@@ -36,8 +41,8 @@ export class AdminLogin {
   });
 
   togglePasswordVisibility(): void {
-  this.showPassword = !this.showPassword;
-}
+    this.showPassword = !this.showPassword;
+  }
 
   onLogin(): void {
 
@@ -55,12 +60,13 @@ export class AdminLogin {
 
       next: response => {
 
-        sessionStorage.setItem('token', response.token);
-        sessionStorage.setItem('userId', response.userId.toString());
-        sessionStorage.setItem('role', response.role);
-        sessionStorage.setItem('fullName', response.fullName);
+        // Save session using Token Service
+        this.tokenService.saveSession(response);
 
         this.isSubmitting = false;
+
+        // Navigate to Admin Dashboard
+        this.router.navigate(['/admin/dashboard']);
       },
 
       error: error => {

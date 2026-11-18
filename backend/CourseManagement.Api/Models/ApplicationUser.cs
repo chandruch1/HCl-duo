@@ -1,4 +1,6 @@
 
+using CourseManagement.Api.Enums;
+
 namespace CourseManagement.Api.Models;
 
 public class ApplicationUser
@@ -11,7 +13,7 @@ public class ApplicationUser
 
     public string PasswordHash { get; set; } = string.Empty;
 
-    public string Role { get; set; } = "Student";
+    public UserRole Role { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
