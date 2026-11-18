@@ -2,6 +2,7 @@
 using CourseManagement.Api.Data;
 using CourseManagement.Api.Repositories.Interfaces;
 using CourseManagement.Api.Repositories.Implementations;
+using CourseManagement.Api.Services.Interfaces;
 using CourseManagement.Api.Interfaces.Services;
 using CourseManagement.Api.Services;
 using CourseManagement.Api.Services.Implementations;
@@ -74,7 +75,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-
+// Course Module Dependency Injection
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 var app = builder.Build();
 
 // Seed Admin
