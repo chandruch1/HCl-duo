@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { StudentService, Student } from '../../../../core/services/student';
@@ -14,6 +14,7 @@ import { StudentService, Student } from '../../../../core/services/student';
 export class StudentList implements OnInit {
 
   private studentService = inject(StudentService);
+  private cdr = inject(ChangeDetectorRef);
 
   students: Student[] = [];
 
@@ -42,6 +43,7 @@ export class StudentList implements OnInit {
       console.log('Student Count:', this.students.length);
 
       this.isLoading = false;
+      this.cdr.detectChanges();
     },
     error: (error) => {
       console.error('Error loading students:', error);

@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit , ChangeDetectorRef  } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StudentService, Student } from '../../../../core/services/student';
 import { RouterLink } from '@angular/router';
@@ -16,6 +16,7 @@ export class StudentDetails implements OnInit {
 
   private studentService = inject(StudentService);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef)
 
   student: Student | null = null;
 
@@ -42,6 +43,7 @@ export class StudentDetails implements OnInit {
       next: (response) => {
         this.student = response;
         this.isLoading = false;
+        this.cdr.detectChanges()
       },
 
       error: (error) => {

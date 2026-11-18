@@ -1,5 +1,5 @@
 
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit , ChangeDetectorRef } from '@angular/core';
 import {
   FormGroup,
   FormControl,
@@ -22,6 +22,7 @@ export class StudentEdit implements OnInit {
   private studentService = inject(StudentService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef)
 
   student: Student | null = null;
 
@@ -72,6 +73,7 @@ export class StudentEdit implements OnInit {
       this.student = response.data;
       this.successMessage = response.message;
       this.isSubmitting = false;
+      this.cdr.detectChanges();
     },
     error: error => {
       this.errorMessage = error.error?.message || 'Unable to update student.';
