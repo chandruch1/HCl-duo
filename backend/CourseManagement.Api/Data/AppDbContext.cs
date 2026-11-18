@@ -17,7 +17,6 @@ public class AppDbContext : DbContext
 
     public DbSet<Course> Courses { get; set; }
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -33,6 +32,10 @@ public class AppDbContext : DbContext
             .WithOne(s => s.User)
             .HasForeignKey<Student>(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-    }
 
+        // Course Price precision
+        modelBuilder.Entity<Course>()
+            .Property(c => c.Price)
+            .HasPrecision(18, 2);
+    }
 }
