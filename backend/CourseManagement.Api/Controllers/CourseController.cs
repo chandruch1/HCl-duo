@@ -8,7 +8,7 @@ namespace CourseManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class CourseController : ControllerBase
 {
     private readonly ICourseService _courseService;
@@ -37,6 +37,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateCourse(CourseCreateDto dto)
     {
         var course = await _courseService.CreateCourseAsync(dto);
@@ -48,6 +49,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCourse(int id, CourseUpdateDto dto)
     {
         var course = await _courseService.UpdateCourseAsync(id, dto);
@@ -59,6 +61,7 @@ public class CourseController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCourse(int id)
     {
         bool deleted = await _courseService.DeleteCourseAsync(id);

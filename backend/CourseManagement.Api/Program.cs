@@ -78,6 +78,10 @@ builder.Services.AddAuthorization();
 // Course Module Dependency Injection
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 var app = builder.Build();
 
 // Seed Admin
@@ -85,6 +89,7 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider
         .GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
 
     var configuration = scope.ServiceProvider
         .GetRequiredService<IConfiguration>();

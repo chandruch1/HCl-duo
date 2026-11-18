@@ -17,6 +17,10 @@ public class AppDbContext : DbContext
 
     public DbSet<Course> Courses { get; set; }
 
+    public DbSet<Enrollment> Enrollments { get; set; }
+
+    public DbSet<Payment> Payments { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -36,6 +40,11 @@ public class AppDbContext : DbContext
         // Course Price precision
         modelBuilder.Entity<Course>()
             .Property(c => c.Price)
+            .HasPrecision(18, 2);
+
+        // Payment Amount precision
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Amount)
             .HasPrecision(18, 2);
     }
 }

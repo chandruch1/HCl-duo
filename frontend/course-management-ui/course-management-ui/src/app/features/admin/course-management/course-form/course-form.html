@@ -1,0 +1,162 @@
+<div class="container-fluid p-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold">{{ isEditMode ? 'Edit Course' : 'Add New Course' }}</h3>
+      <p class="text-secondary mb-0">
+        {{ isEditMode ? 'Update course information.' : 'Fill in the details to create a new course.' }}
+      </p>
+    </div>
+
+    <button class="btn btn-outline-secondary" routerLink="/admin/courses">
+      <i class="bi bi-arrow-left me-2"></i>
+      Back to Courses
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading) {
+    <div class="text-center p-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-secondary mt-2">Loading course...</p>
+    </div>
+  }
+
+  @else {
+    <!-- Form Card -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-primary text-white p-3">
+            <h5 class="mb-0 fw-semibold">
+              <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+              {{ isEditMode ? 'Course Information' : 'New Course Details' }}
+            </h5>
+          </div>
+
+          <div class="card-body p-4">
+
+            <!-- Success / Error Alerts -->
+            @if (successMessage) {
+              <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                <div>{{ successMessage }}</div>
+              </div>
+            }
+
+            @if (errorMessage) {
+              <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>{{ errorMessage }}</div>
+              </div>
+            }
+
+            <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+
+              <!-- Title -->
+              <div class="mb-3">
+                <label for="title" class="form-label fw-semibold">Course Title <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  id="title"
+                  class="form-control"
+                  placeholder="e.g. Full-Stack Web Development with .NET & Angular"
+                  formControlName="title"
+                  [class.is-invalid]="courseForm.get('title')?.touched && courseForm.get('title')?.invalid"
+                >
+                @if (courseForm.get('title')?.touched && courseForm.get('title')?.errors?.['required']) {
+                  <div class="invalid-feedback">Course title is required.</div>
+                }
+                @if (courseForm.get('title')?.touched && courseForm.get('title')?.errors?.['minlength']) {
+                  <div class="invalid-feedback">Title must be at least 2 characters.</div>
+                }
+              </div>
+
+              <!-- Description -->
+              <div class="mb-3">
+                <label for="description" class="form-label fw-semibold">Description</label>
+                <textarea
+                  id="description"
+                  class="form-control"
+                  rows="4"
+                  placeholder="Enter detailed description of what students will learn..."
+                  formControlName="description"
+                ></textarea>
+              </div>
+
+              <div class="row">
+                <!-- Price -->
+                <div class="col-md-6 mb-3">
+                  <label for="price" class="form-label fw-semibold">Price (₹) <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input
+                      type="number"
+                      id="price"
+                      class="form-control"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                      formControlName="price"
+                      [class.is-invalid]="courseForm.get('price')?.touched && courseForm.get('price')?.invalid"
+                    >
+                    @if (courseForm.get('price')?.touched && courseForm.get('price')?.errors?.['required']) {
+                      <div class="invalid-feedback">Price is required.</div>
+                    }
+                    @if (courseForm.get('price')?.touched && courseForm.get('price')?.errors?.['min']) {
+                      <div class="invalid-feedback">Price cannot be negative.</div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Duration in Days -->
+                <div class="col-md-6 mb-3">
+                  <label for="durationInDays" class="form-label fw-semibold">Duration (in Days) <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input
+                      type="number"
+                      id="durationInDays"
+                      class="form-control"
+                      placeholder="30"
+                      min="1"
+                      formControlName="durationInDays"
+                      [class.is-invalid]="courseForm.get('durationInDays')?.touched && courseForm.get('durationInDays')?.invalid"
+                    >
+                    <span class="input-group-text">Days</span>
+                    @if (courseForm.get('durationInDays')?.touched && courseForm.get('durationInDays')?.errors?.['required']) {
+                      <div class="invalid-feedback">Duration is required.</div>
+                    }
+                    @if (courseForm.get('durationInDays')?.touched && courseForm.get('durationInDays')?.errors?.['min']) {
+                      <div class="invalid-feedback">Duration must be at least 1 day.</div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-outline-secondary" routerLink="/admin/courses">
+                  Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="courseForm.invalid || isSubmitting">
+                  @if (isSubmitting) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                  }
+                  <i class="bi bi-check2 me-1"></i>
+                  {{ isEditMode ? 'Update Course' : 'Create Course' }}
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>
+

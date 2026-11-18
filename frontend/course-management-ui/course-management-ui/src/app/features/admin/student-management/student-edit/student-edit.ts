@@ -1,5 +1,11 @@
 
-import { Component, inject, OnInit , ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import {
   FormGroup,
   FormControl,
@@ -8,7 +14,12 @@ import {
 } from '@angular/forms';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { StudentService, Student, UpdateStudentDto } from '../../../../core/services/student';
+
+import {
+  StudentService,
+  Student,
+  UpdateStudentDto
+} from '../../../../core/services/student';
 
 @Component({
   selector: 'app-student-edit',
@@ -22,12 +33,13 @@ export class StudentEdit implements OnInit {
   private studentService = inject(StudentService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef)
+  private cdr = inject(ChangeDetectorRef);
 
   student: Student | null = null;
 
   isLoading = false;
   isSubmitting = false;
+
   errorMessage = '';
   successMessage = '';
 
@@ -43,7 +55,9 @@ export class StudentEdit implements OnInit {
 
     address: new FormControl('', {
       nonNullable: true,
-      validators: [Validators.maxLength(250)]
+      validators: [
+        Validators.maxLength(250)
+      ]
     }),
 
     dateOfBirth: new FormControl('', {
@@ -51,36 +65,6 @@ export class StudentEdit implements OnInit {
     })
 
   });
-
-  onSubmit(): void {
-  if (this.editForm.invalid || !this.student) {
-    this.editForm.markAllAsTouched();
-    return;
-  }
-
-  this.isSubmitting = true;
-  this.errorMessage = '';
-  this.successMessage = '';
-
-  const dto: UpdateStudentDto = {
-    phone: this.editForm.controls.phone.value,
-    address: this.editForm.controls.address.value || null,
-    dateOfBirth: this.editForm.controls.dateOfBirth.value || null
-  };
-
-  this.studentService.updateStudent(this.student.id, dto).subscribe({
-    next: response => {
-      this.student = response.data;
-      this.successMessage = response.message;
-      this.isSubmitting = false;
-      this.cdr.detectChanges();
-    },
-    error: error => {
-      this.errorMessage = error.error?.message || 'Unable to update student.';
-      this.isSubmitting = false;
-    }
-  });
-}
 
   ngOnInit(): void {
 
@@ -98,6 +82,7 @@ export class StudentEdit implements OnInit {
   loadStudent(id: number): void {
 
     this.isLoading = true;
+    this.errorMessage = '';
 
     this.studentService.getStudentById(id).subscribe({
 
@@ -114,19 +99,72 @@ export class StudentEdit implements OnInit {
         });
 
         this.isLoading = false;
+
+        console.log('Student Details:', this.student);
+
+        this.cdr.detectChanges();
       },
 
       error: (error) => {
+
+        console.error('Error loading student:', error);
 
         this.errorMessage =
           error.error?.message || 'Unable to load student.';
 
         this.isLoading = false;
+
+        this.cdr.detectChanges();
       }
 
     });
   }
 
+  // Update student information
+  onSubmit(): void {
+
+    if (this.editForm.invalid || !this.student) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    const dto: UpdateStudentDto = {
+      phone: this.editForm.controls.phone.value,
+      address: this.editForm.controls.address.value || null,
+      dateOfBirth: this.editForm.controls.dateOfBirth.value || null
+    };
+
+    this.studentService.updateStudent(this.student.id, dto).subscribe({
+
+      next: (response) => {
+
+        this.student = response.data;
+        this.successMessage = response.message;
+        this.isSubmitting = false;
+
+        this.cdr.detectChanges();
+      },
+
+      error: (error) => {
+
+        console.error('Error updating student:', error);
+
+        this.errorMessage =
+          error.error?.message || 'Unable to update student.';
+
+        this.isSubmitting = false;
+
+        this.cdr.detectChanges();
+      }
+
+    });
+  }
+
+  // Navigate back to student list
   goBack(): void {
     this.router.navigate(['/admin/students']);
   }
