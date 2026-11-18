@@ -13,4 +13,7 @@ public interface IStudentService
     Task<StudentResponseDto> UpdateMyProfileAsync(
         int userId,
         UpdateStudentDto dto);
+
+    Task<StudentResponseDto> UpdateStudentAsync(
+    int id,UpdateStudentDto dto);
 }

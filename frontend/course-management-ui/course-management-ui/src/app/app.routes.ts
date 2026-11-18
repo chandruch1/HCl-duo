@@ -6,6 +6,7 @@ import { AdminLogin } from './features/auth/admin-login/admin-login';
 import { AdminDashboard } from './features/admin/admin-dashboard/admin-dashboard';
 import { adminAuthGuard } from './core/guards/admin-auth-guard';
 import { StudentManagement } from './features/admin/student-management/student-management';
+import { StudentDetails } from './features/admin/student-management/student-details/student-details';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'student-login', pathMatch: 'full' },
@@ -13,6 +14,9 @@ export const routes: Routes = [
   { path: 'student-login', component: StudentLogin },
   { path: 'student-register', component: StudentRegister },
   { path: 'admin-login', component: AdminLogin },
+  {
+  path: 'admin/students/:id', component: StudentDetails, canActivate: [adminAuthGuard]
+}
 
   { path: 'admin/dashboard', component: AdminDashboard , canActivate : [adminAuthGuard] },
   {
