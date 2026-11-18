@@ -17,9 +17,15 @@ public class AppDbContext : DbContext
 
     public DbSet<Course> Courses { get; set; }
 
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Store UserRole enum as string in SQL Server
+        modelBuilder.Entity<ApplicationUser>()
+            .Property(u => u.Role)
+            .HasConversion<string>();
 
         // User - Student (One-to-One)
         modelBuilder.Entity<ApplicationUser>()
@@ -28,4 +34,5 @@ public class AppDbContext : DbContext
             .HasForeignKey<Student>(s => s.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
+
 }

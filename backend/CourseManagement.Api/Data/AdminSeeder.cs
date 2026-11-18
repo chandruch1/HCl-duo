@@ -1,5 +1,7 @@
+
 using CourseManagement.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using CourseManagement.Api.Enums;
 
 namespace CourseManagement.Api.Data;
 
@@ -9,30 +11,47 @@ public static class AdminSeeder
         AppDbContext context,
         IConfiguration configuration)
     {
-        bool adminExists = await context.Users
-            .AnyAsync(u => u.Role == "Admin");
+        string email = configuration["Admin:Email"]
+            ?? throw new InvalidOperationException("Admin email is missing");
 
-        if (adminExists)
+        string password = configuration["Admin:Password"]
+            ?? throw new InvalidOperationException("Admin password is missing");
+
+        var admin = await context.Users
+            .FirstOrDefaultAsync(u => u.Role == UserRole.Admin);
+
+        if (admin != null)
+        {
+            bool resetPassword = configuration.GetValue<bool>(
+                "Admin:ResetPassword");
+
+            if (resetPassword)
+            {
+                admin.PasswordHash =
+                    BCrypt.Net.BCrypt.HashPassword(password);
+
+                await context.SaveChangesAsync();
+
+                Console.WriteLine("Admin password reset successfully.");
+            }
+
             return;
+        }
 
-        var admin = new ApplicationUser
+        var newAdmin = new ApplicationUser
         {
             FullName = configuration["Admin:FullName"]
                 ?? throw new InvalidOperationException("Admin name is missing"),
 
-            Email = configuration["Admin:Email"]
-                ?? throw new InvalidOperationException("Admin email is missing"),
-
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(
-                configuration["Admin:Password"]
-                ?? throw new InvalidOperationException("Admin password is missing")
-            ),
-
-            Role = "Admin",
+            Email = email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+            Role = UserRole.Admin,
             CreatedAt = DateTime.UtcNow
         };
 
-        await context.Users.AddAsync(admin);
+        await context.Users.AddAsync(newAdmin);
         await context.SaveChangesAsync();
+
+        Console.WriteLine("Admin account created successfully.");
     }
 }
