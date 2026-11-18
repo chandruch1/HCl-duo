@@ -31,6 +31,35 @@ public class StudentService : IStudentService
         return students.Select(MapToDto).ToList();
     }
 
+    public async Task<StudentResponseDto> UpdateStudentAsync(
+    int id,
+    UpdateStudentDto dto)
+{
+    var student = await _studentRepository.GetByIdAsync(id);
+
+    if (student == null)
+    {
+        throw new KeyNotFoundException("Student not found.");
+    }
+
+    student.Phone = dto.Phone;
+    student.Address = dto.Address;
+    student.DateOfBirth = dto.DateOfBirth;
+
+    await _studentRepository.UpdateAsync(student);
+
+    return new StudentResponseDto
+    {
+        Id = student.Id,
+        UserId = student.UserId,
+        FullName = student.User!.FullName,
+        Email = student.User.Email,
+        Phone = student.Phone,
+        Address = student.Address,
+        DateOfBirth = student.DateOfBirth
+    };
+}
+
     public async Task<StudentResponseDto> GetByIdAsync(int id)
     {
         var student = await _studentRepository.GetByIdAsync(id);

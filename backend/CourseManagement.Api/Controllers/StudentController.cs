@@ -68,6 +68,29 @@ public class StudentController : ControllerBase
         }
     }
 
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateStudent(int id,UpdateStudentDto dto)
+    {
+        try
+        {
+            var updatedStudent = await _studentService.UpdateStudentAsync(id, dto);
+
+            return Ok(new
+            {
+                message = "Student updated successfully.",
+                data = updatedStudent
+            });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
     // PUT: api/Student/me
     // Student can update their own profile
     [HttpPut("me")]
