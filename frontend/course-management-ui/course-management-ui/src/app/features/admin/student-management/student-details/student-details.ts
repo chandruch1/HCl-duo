@@ -51,6 +51,7 @@ export class StudentDetails implements OnInit {
           error.error?.message || 'Unable to load student details.';
 
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
 
     });

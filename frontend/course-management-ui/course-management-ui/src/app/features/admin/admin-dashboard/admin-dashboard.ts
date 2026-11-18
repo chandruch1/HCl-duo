@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Token } from '../../../core/services/token';
@@ -15,6 +15,7 @@ export class AdminDashboard implements OnInit {
   private tokenService = inject(Token);
   private dashboardService = inject(DashboardService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   adminName: string = '';
   stats: AdminDashboardStats | null = null;
@@ -29,14 +30,18 @@ export class AdminDashboard implements OnInit {
   loadStats(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
+
     this.dashboardService.getAdminStats().subscribe({
       next: (data) => {
         this.stats = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = 'Failed to load dashboard statistics.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

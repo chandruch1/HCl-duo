@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -17,6 +17,7 @@ export class StudentProfile implements OnInit {
   private studentService = inject(StudentService);
   private tokenService = inject(Token);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   student: Student | null = null;
   profileForm!: FormGroup;
@@ -42,6 +43,8 @@ export class StudentProfile implements OnInit {
   loadProfile(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
+
     this.studentService.getMyProfile().subscribe({
       next: (data) => {
         this.student = data;
@@ -55,10 +58,12 @@ export class StudentProfile implements OnInit {
           dateOfBirth: formattedDob
         });
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load profile details.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -67,6 +72,7 @@ export class StudentProfile implements OnInit {
     this.isEditing = !this.isEditing;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
   }
 
   onSubmit(): void {
@@ -77,6 +83,7 @@ export class StudentProfile implements OnInit {
 
     this.isSubmitting = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     const formValues = this.profileForm.value;
     const dto: UpdateStudentDto = {
@@ -91,11 +98,16 @@ export class StudentProfile implements OnInit {
         this.isSubmitting = false;
         this.isEditing = false;
         this.successMessage = 'Profile updated successfully!';
-        setTimeout(() => this.successMessage = '', 4000);
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.successMessage = '';
+          this.cdr.detectChanges();
+        }, 4000);
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Failed to update profile.';
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -105,4 +117,3 @@ export class StudentProfile implements OnInit {
     this.router.navigate(['/student-login']);
   }
 }
-

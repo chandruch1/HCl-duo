@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { CourseService, Course } from '../../../../core/services/course';
 })
 export class CourseList implements OnInit {
   private courseService = inject(CourseService);
+  private cdr = inject(ChangeDetectorRef);
 
   courses: Course[] = [];
   searchText: string = '';
@@ -27,14 +28,18 @@ export class CourseList implements OnInit {
   loadCourses(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
+
     this.courseService.getAllCourses().subscribe({
       next: (data) => {
         this.courses = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = 'Failed to load courses. Please try again.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -56,11 +61,19 @@ export class CourseList implements OnInit {
         next: () => {
           this.successMessage = `Course "${title}" deactivated successfully.`;
           this.loadCourses();
-          setTimeout(() => this.successMessage = '', 4000);
+          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.successMessage = '';
+            this.cdr.detectChanges();
+          }, 4000);
         },
         error: (err) => {
           this.errorMessage = 'Failed to deactivate course.';
-          setTimeout(() => this.errorMessage = '', 4000);
+          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.errorMessage = '';
+            this.cdr.detectChanges();
+          }, 4000);
         }
       });
     }

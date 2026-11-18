@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -16,6 +16,7 @@ export class CourseForm implements OnInit {
   private courseService = inject(CourseService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   courseForm!: FormGroup;
   isEditMode: boolean = false;
@@ -47,6 +48,8 @@ export class CourseForm implements OnInit {
 
   private loadCourse(id: number): void {
     this.isLoading = true;
+    this.cdr.detectChanges();
+
     this.courseService.getCourseById(id).subscribe({
       next: (course) => {
         this.courseForm.patchValue({
@@ -56,10 +59,12 @@ export class CourseForm implements OnInit {
           durationInDays: course.durationInDays
         });
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = 'Failed to load course details.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -72,6 +77,7 @@ export class CourseForm implements OnInit {
 
     this.isSubmitting = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     const formValues = this.courseForm.value;
 
@@ -87,11 +93,13 @@ export class CourseForm implements OnInit {
         next: () => {
           this.successMessage = 'Course updated successfully!';
           this.isSubmitting = false;
+          this.cdr.detectChanges();
           setTimeout(() => this.router.navigate(['/admin/courses']), 1200);
         },
         error: (err) => {
           this.errorMessage = err.error?.message || 'Failed to update course.';
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }
       });
     } else {
@@ -106,14 +114,15 @@ export class CourseForm implements OnInit {
         next: () => {
           this.successMessage = 'Course created successfully!';
           this.isSubmitting = false;
+          this.cdr.detectChanges();
           setTimeout(() => this.router.navigate(['/admin/courses']), 1200);
         },
         error: (err) => {
           this.errorMessage = err.error?.message || 'Failed to create course.';
           this.isSubmitting = false;
+          this.cdr.detectChanges();
         }
       });
     }
   }
 }
-

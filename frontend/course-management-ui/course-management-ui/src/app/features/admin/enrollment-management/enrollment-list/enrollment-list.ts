@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { EnrollmentService, Enrollment } from '../../../../core/services/enrollm
 })
 export class EnrollmentList implements OnInit {
   private enrollmentService = inject(EnrollmentService);
+  private cdr = inject(ChangeDetectorRef);
 
   enrollments: Enrollment[] = [];
   searchText: string = '';
@@ -28,14 +29,18 @@ export class EnrollmentList implements OnInit {
   loadEnrollments(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
+
     this.enrollmentService.getAllEnrollments().subscribe({
       next: (data) => {
         this.enrollments = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = 'Failed to load enrollments. Please try again.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -67,11 +72,19 @@ export class EnrollmentList implements OnInit {
       next: (updated) => {
         enrollment.status = updated.status;
         this.successMessage = `Enrollment status updated to ${newStatus}.`;
-        setTimeout(() => this.successMessage = '', 3000);
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.successMessage = '';
+          this.cdr.detectChanges();
+        }, 3000);
       },
       error: (err) => {
         this.errorMessage = 'Failed to update enrollment status.';
-        setTimeout(() => this.errorMessage = '', 3000);
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.errorMessage = '';
+          this.cdr.detectChanges();
+        }, 3000);
       }
     });
   }
@@ -82,11 +95,19 @@ export class EnrollmentList implements OnInit {
         next: () => {
           this.successMessage = 'Enrollment deleted successfully.';
           this.loadEnrollments();
-          setTimeout(() => this.successMessage = '', 3000);
+          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.successMessage = '';
+            this.cdr.detectChanges();
+          }, 3000);
         },
         error: (err) => {
           this.errorMessage = 'Failed to delete enrollment.';
-          setTimeout(() => this.errorMessage = '', 3000);
+          this.cdr.detectChanges();
+          setTimeout(() => {
+            this.errorMessage = '';
+            this.cdr.detectChanges();
+          }, 3000);
         }
       });
     }

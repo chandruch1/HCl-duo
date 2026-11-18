@@ -52,6 +52,7 @@ export class StudentList implements OnInit {
         error.error?.message || 'Unable to load students.';
 
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
   });
 }

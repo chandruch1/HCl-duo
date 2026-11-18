@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -18,6 +18,7 @@ export class MyEnrollments implements OnInit {
   private paymentService = inject(PaymentService);
   private tokenService = inject(Token);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   enrollments: Enrollment[] = [];
   payments: Payment[] = [];
@@ -40,15 +41,18 @@ export class MyEnrollments implements OnInit {
   loadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.enrollmentService.getMyEnrollments().subscribe({
       next: (enrollments) => {
         this.enrollments = enrollments;
         this.loadPayments();
+        this.cdr.detectChanges();
       },
       error: () => {
         this.errorMessage = 'Failed to load your enrollments.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -58,9 +62,11 @@ export class MyEnrollments implements OnInit {
       next: (payments) => {
         this.payments = payments;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -69,11 +75,13 @@ export class MyEnrollments implements OnInit {
     this.selectedEnrollment = enrollment;
     this.paymentMethod = 'Card';
     this.paymentSuccessReceipt = null;
+    this.cdr.detectChanges();
   }
 
   closePaymentModal(): void {
     this.selectedEnrollment = null;
     this.paymentSuccessReceipt = null;
+    this.cdr.detectChanges();
   }
 
   submitPayment(): void {
@@ -81,6 +89,7 @@ export class MyEnrollments implements OnInit {
 
     this.isProcessingPayment = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     const dto: PaymentCreateDto = {
       enrollmentId: this.selectedEnrollment.id,
@@ -94,10 +103,12 @@ export class MyEnrollments implements OnInit {
         this.paymentSuccessReceipt = receipt;
         this.successMessage = `Payment of ₹${receipt.amount} successful! Transaction ID: ${receipt.transactionId}`;
         this.loadData();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isProcessingPayment = false;
         this.errorMessage = err.error?.message || 'Payment processing failed. Please try again.';
+        this.cdr.detectChanges();
       }
     });
   }

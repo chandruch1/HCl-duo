@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { PaymentService, Payment } from '../../../../core/services/payment';
 })
 export class PaymentList implements OnInit {
   private paymentService = inject(PaymentService);
+  private cdr = inject(ChangeDetectorRef);
 
   payments: Payment[] = [];
   searchText: string = '';
@@ -26,14 +27,18 @@ export class PaymentList implements OnInit {
   loadPayments(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
+
     this.paymentService.getAllPayments().subscribe({
       next: (data) => {
         this.payments = data;
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.errorMessage = 'Failed to load payments.';
         this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
